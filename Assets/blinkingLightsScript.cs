@@ -100,6 +100,7 @@ public class blinkingLightsScript : MonoBehaviour
     void playCode()
     {
         if (moduleSolved || isPlaying) { return; }
+        play.AddInteractionPunch(0.4f);
         audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, transform);
         playPresses++;
         Debug.LogFormat("<Blinking Lights #{0}>: Play button pressed, sequence played for time #{1}", moduleId, playPresses);
@@ -109,6 +110,7 @@ public class blinkingLightsScript : MonoBehaviour
     void submitOption()
     {
         if (moduleSolved) { return; }
+        play.AddInteractionPunch(0.4f);
         audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, transform);
         Debug.LogFormat("[Blinking Lights #{0}]: Submit button pressed, with {1} being the number of times the sequence is played.", moduleId, playPresses);
         Debug.LogFormat("[Blinking Lights #{0}]: The correct frequency to submit is {1}.", moduleId, freqs[(correctClip + playPresses) % freqs.Length].ToString("0.000") + " MHz");
@@ -163,7 +165,7 @@ public class blinkingLightsScript : MonoBehaviour
         new float[]{2f, 0.5f, 1f, 1f, 0.5f, 1f, 1f, 2f, 0.5f, 1f, 1f, 0.5f, 1f, 1f},
         new float[]{1f, 1f, 2f, 0.5f, 0.5f, 1f, 1f, 0.5f, 1.5f, 4f, 1f, 1f, 2f, 0.5f, 0.5f, 1f, 1f, 0.5f, 1.5f, 4f},
         new float[]{1f, 1f, 0.5f, 0.5f, 1f, 1f, 1f, 1.5f, 0.5f, 1f, 1f, 2.5f, 1.5f, 1f, 1.5f, 1.5f, 1f, 1.5f, 1.5f, 1.5f, 1f, 1f, 1f, 2f, 2f},
-        new float[]{0.75f, 0.25f, 1f, 1f, 1f, 1f, 1.75f, 0.25f, 0.75f, 0.25f, 0.75f, 0.25f, 1f, 2f, 0.75f, 0.25f, 3f},
+        new float[]{0.66f, 0.34f, 1f, 1f, 1f, 1f, 1.66f, 0.34f, 0.66f, 0.34f, 0.66f, 0.34f, 1f, 2f, 0.66f, 0.34f, 3f},
         new float[]{1f, 0.5f, 0.5f, 1f, 0.5f, 0.5f, 0.5f, 0.5f, 1f, 0.5f, 0.5f, 0.5f, 0.5f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 0.5f, 0.5f, 1f, 0.5f, 0.5f, 0.5f, 0.5f, 1f, 0.5f, 0.5f, 0.5f, 0.5f, 1f, 1f, 1f, 0.34f, 0.33f, 0.33f, 1f, 1f, 1f, 1f},
         new float[]{1f, 0.75f, 1.25f, 0.5f, 1f, 1.5f, 1f, 0.75f, 1.25f, 0.5f, 1f, 1.5f},
         new float[]{0.5f, 1.5f, 0.25f, 0.25f, 0.5f, 2f, 2f, 0.25f, 0.25f, 0.5f, 0.5f, 5f, 0.5f, 1f},
@@ -215,23 +217,81 @@ public class blinkingLightsScript : MonoBehaviour
         isPlaying = false;
     }
     
-    /*Twitch plays
+    //Twitch plays
     #pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"";
+    private readonly string TwitchHelpMessage = @"<!{0} play> to press the play button, <!{0} tx 3.505 MHz> to submit the frequency 3.505 MHz";
     #pragma warning restore 414
 
     IEnumerator ProcessTwitchCommand(string command)
     {
         command = command.ToLowerInvariant().Trim();
-        Match m = Regex.Match(command, @"^()$");
+        string[] parameters = command.Split(' ');
+        if (Regex.IsMatch(command, @"^\s*play\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+            yield return null;
+            play.OnInteract();
+        }
+        else if (Regex.IsMatch(parameters[0], @"^\s*tx\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant) || Regex.IsMatch(parameters[0], @"^\s*submit\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+            yield return null;
+            if (parameters.Length > 3)
+            {
+                yield return "sendtochaterror Too many parameters!";
+            }
+            else if (parameters.Length == 2 || parameters.Length == 3)
+            {
+                if (parameters.Length == 3)
+                {
+                    if (parameters[2] != "mhz")
+                        yield return "sendtochaterror Wrong unit to submit!";
+                }
+                else
+                {
+                    float temp = -1;
+                    if (!float.TryParse(parameters[1], out temp))
+                    {
+                        yield return "sendtochaterror Invalid frequency to submit!";
+                        yield break;
+                    }
+                    if (!freqs.Contains(temp))
+                    {
+                        yield return "sendtochaterror Invalid frequency to submit!";
+                        yield break;
+                    }
+
+                    while (freqs[selected] != temp)
+                    {
+                        yield return "trycancel";
+                        if (freqs[selected] > temp)
+                            arrows[0].OnInteract();
+                        else if (freqs[selected] < temp)
+                            arrows[1].OnInteract();
+                        yield return new WaitForSeconds(0.1f);
+                    }
+                    submit.OnInteract();
+
+                }
+            }
+            else
+                yield return "sendtochaterror Please specify which frequency to submit!";
+        }
+        else
+            yield return "sendtochaterror Invalid command";
         yield return null;
     }
-    */
 
-    /*Force Solve Handler
+    //Force Solve Handler
     IEnumerator TwitchHandleForcedSolve()
     {
-        yield return null;
+        while (!moduleSolved)
+        {
+            if (selected > (correctClip + playPresses) % freqs.Length)
+                arrows[0].OnInteract();
+            else if (selected < (correctClip + playPresses) % freqs.Length)
+                arrows[1].OnInteract();
+            if (selected == (correctClip + playPresses) % freqs.Length)
+                submit.OnInteract();
+            yield return new WaitForSeconds(0.1f);
+        }
     }
-    */
 }

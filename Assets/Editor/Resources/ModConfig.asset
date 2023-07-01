@@ -22,6 +22,6 @@ MonoBehaviour:
     Mod ID: blinkingNotes
 
     Manual Link: TBA'
-  version: 1.0
+  version: 1.1.2
   outputFolder: build
   previewImage: {fileID: 2800000, guid: e18587f0a6f667d4bb7dba14fd6bcc7a, type: 3}
