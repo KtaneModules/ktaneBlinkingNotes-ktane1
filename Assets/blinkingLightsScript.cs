@@ -72,8 +72,8 @@ public class blinkingLightsScript : MonoBehaviour
         codeLight.SetActive(false);
 
         correctClip = UnityEngine.Random.Range(0, musicNames.Length);
-        Debug.LogFormat("[Blinking Lights #{0}]: Module initiated, selected note sequence: {1} ", moduleId, musicNames[correctClip]);
-        Debug.LogFormat("[Blinking Lights #{0}]: The starting frequency is {1}.", moduleId, freqs[correctClip].ToString("0.000") + " MHz");
+        Debug.LogFormat("[Blinking Notes #{0}]: Module initiated, selected note sequence: {1} ", moduleId, musicNames[correctClip]);
+        Debug.LogFormat("[Blinking Notes #{0}]: The starting frequency is {1}.", moduleId, freqs[correctClip].ToString("0.000") + " MHz");
 
     }
 
@@ -103,7 +103,7 @@ public class blinkingLightsScript : MonoBehaviour
         play.AddInteractionPunch(0.4f);
         audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, transform);
         playPresses++;
-        Debug.LogFormat("<Blinking Lights #{0}>: Play button pressed, sequence played for time #{1}", moduleId, playPresses);
+        Debug.LogFormat("<Blinking Notes #{0}>: Play button pressed, sequence played for time #{1}", moduleId, playPresses);
         StartCoroutine("codeFlash");
     }
 
@@ -112,11 +112,11 @@ public class blinkingLightsScript : MonoBehaviour
         if (moduleSolved) { return; }
         play.AddInteractionPunch(0.4f);
         audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, transform);
-        Debug.LogFormat("[Blinking Lights #{0}]: Submit button pressed, with {1} being the number of times the sequence is played.", moduleId, playPresses);
-        Debug.LogFormat("[Blinking Lights #{0}]: The correct frequency to submit is {1}.", moduleId, freqs[(correctClip + playPresses) % freqs.Length].ToString("0.000") + " MHz");
+        Debug.LogFormat("[Blinking Notes #{0}]: Submit button pressed, with {1} being the number of times the sequence is played.", moduleId, playPresses);
+        Debug.LogFormat("[Blinking Notes #{0}]: The correct frequency to submit is {1}.", moduleId, freqs[(correctClip + playPresses) % freqs.Length].ToString("0.000") + " MHz");
         if (selected == (correctClip + playPresses) % freqs.Length)
         {
-            Debug.LogFormat("[Blinking Lights #{0}]: Correct frequency submitted! Module solved!", moduleId);
+            Debug.LogFormat("[Blinking Notes #{0}]: Correct frequency submitted! Module solved!", moduleId);
             module.HandlePass();
             moduleSolved = true;
             if (isPlaying)
@@ -127,10 +127,10 @@ public class blinkingLightsScript : MonoBehaviour
         }
         else
         {
-            Debug.LogFormat("[Blinking Lights #{0}]: Wrong frequency submitted ({1})! Strike!", moduleId, freqs[selected].ToString("0.000") + " MHz");
+            Debug.LogFormat("[Blinking Notes #{0}]: Wrong frequency submitted ({1})! Strike!", moduleId, freqs[selected].ToString("0.000") + " MHz");
             module.HandleStrike();
             playPresses = 0;
-            Debug.LogFormat("[Blinking Lights #{0}]: Play button presses are now reset back to zero.", moduleId);
+            Debug.LogFormat("[Blinking Notes #{0}]: Play button presses are now reset back to zero.", moduleId);
         }
     }
 
