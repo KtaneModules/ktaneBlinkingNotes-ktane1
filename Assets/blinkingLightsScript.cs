@@ -240,10 +240,9 @@ public class blinkingLightsScript : MonoBehaviour
             }
             else if (parameters.Length == 2 || parameters.Length == 3)
             {
-                if (parameters.Length == 3)
+                if (parameters.Length == 3 && parameters[2] != "mhz")
                 {
-                    if (parameters[2] != "mhz")
-                        yield return "sendtochaterror Wrong unit to submit!";
+                    yield return "sendtochaterror Wrong unit to submit!";
                 }
                 else
                 {
